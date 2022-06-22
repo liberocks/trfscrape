@@ -131,7 +131,7 @@ const run = async () => {
                     try {
                         console.log(`[${moment().format('HH:mm:ss')}] Processing ${city.name}>${type}>${transport.transportName}>${schedule.scheduleId}`)
                         await fetchScheduleDetail(city.name, type, schedule.scheduleId);
-                        await sleep(Math.ceil(Math.random() * 1e4) + 2000)
+                        await sleep(Math.ceil(Math.random() * 3e3) + 1000)
                     } catch (e) {
                         console.log(`[${moment().format('HH:mm:ss')}] Error on ${city.name}>${type}>${transport.transportName}>${schedule.scheduleId} : ${e.message}`, e)
                     }
