@@ -8,49 +8,49 @@ import moment from 'moment';
 const DUMP_DIR = './dump'
 
 const cities = [{
-        name: 'jakarta',
-        transportationTypes: ['bus', 'train', 'transjakarta', 'mediumbus', 'angkot']
-    }, {
-        name: 'rio',
-        transportationTypes: ['metrotrains', 'bus', 'brt', 'touristic', 'ferry', 'minibus', 'tram'],
-    }, {
-        name: 'saopaulo',
-        transportationTypes: ['metro', 'bus', 'emtu', 'ferry', 'touristic', '']
-    }, {
-        name: 'riga',
-        transportationTypes: ['tram', 'trolleybus', 'bus', 'minibus']
-    }, {
-        name: 'tallinn',
-        transportationTypes: ['tram', 'trolleybus', 'bus', 'regionalbus', 'train']
-    }, {
-        name: 'kaunas',
-        transportationTypes: ['trolleybus', 'bus', 'minibus', 'districtbus']
-    },
-    {
-        name: 'klaipeda',
-        transportationTypes: ['bus', 'minibus', 'ferry', 'districtbus']
-    }, {
-        name: 'panevezys',
-        transportationTypes: ['bus', 'districtbus']
-    }, {
-        name: 'siauliai',
-        transportationTypes: ['bus']
-    }, {
-        name: 'vilnius',
-        transportationTypes: ['trolleybus', 'bus']
-    }, {
-        name: 'ankara',
-        transportationTypes: ['metro', 'train', 'gondola', 'bus']
-    }, {
-        name: 'bursa',
-        transportationTypes: ['metro', 'tram', 'bus']
-    }, {
-        name: 'istanbul',
-        transportationTypes: ['metro', 'tram', 'metrobus', 'bus', 'ferry', 'minibus']
-    }, {
-        name: 'izmir',
-        transportationTypes: ['metro', 'bus', 'ferry', 'tram']
-    }
+    name: 'jakarta',
+    transportationTypes: ['bus', 'train', 'transjakarta', 'mediumbus', 'angkot']
+}, {
+    name: 'rio',
+    transportationTypes: ['metrotrains', 'bus', 'brt', 'touristic', 'ferry', 'minibus', 'tram'],
+}, {
+    name: 'saopaulo',
+    transportationTypes: ['metro', 'bus', 'emtu', 'ferry', 'touristic', '']
+}, {
+    name: 'riga',
+    transportationTypes: ['tram', 'trolleybus', 'bus', 'minibus']
+}, {
+    name: 'tallinn',
+    transportationTypes: ['tram', 'trolleybus', 'bus', 'regionalbus', 'train']
+}, {
+    name: 'kaunas',
+    transportationTypes: ['trolleybus', 'bus', 'minibus', 'districtbus']
+},
+{
+    name: 'klaipeda',
+    transportationTypes: ['bus', 'minibus', 'ferry', 'districtbus']
+}, {
+    name: 'panevezys',
+    transportationTypes: ['bus', 'districtbus']
+}, {
+    name: 'siauliai',
+    transportationTypes: ['bus']
+}, {
+    name: 'vilnius',
+    transportationTypes: ['trolleybus', 'bus']
+}, {
+    name: 'ankara',
+    transportationTypes: ['metro', 'train', 'gondola', 'bus']
+}, {
+    name: 'bursa',
+    transportationTypes: ['metro', 'tram', 'bus']
+}, {
+    name: 'istanbul',
+    transportationTypes: ['metro', 'tram', 'metrobus', 'bus', 'ferry', 'minibus']
+}, {
+    name: 'izmir',
+    transportationTypes: ['metro', 'bus', 'ferry', 'tram']
+}
 ]
 
 const sleep = (ms) => {
@@ -59,13 +59,13 @@ const sleep = (ms) => {
     });
 }
 
-const fetchScheduleDetail = async(city, type, lineId) => {
+const fetchScheduleDetail = async (city, type, lineId) => {
     const directoryPath = `${DUMP_DIR}/${city.name}/${type}`
     fs.mkdirSync(directoryPath, { recursive: true });
     const filename = `${directoryPath}/${lineId}.json`
 
     if (!fs.existsSync(filename)) {
-        const url = `${process.env.BASE_URL}/${city.name}/schedule?scheduleId=${lineId}&transportType=${type}`
+        const url = `${process.env.BASE_URL}/${city}/schedule?scheduleId=${lineId}&transportType=${type}`
         const result = await fetch(url);
 
         let data = ''
@@ -84,35 +84,42 @@ const fetchScheduleDetail = async(city, type, lineId) => {
     }
 }
 
-const fetchScheduleOutline = async(city, type) => {
+const fetchScheduleOutline = async (city, type) => {
     const directoryPath = `${DUMP_DIR}/${city.name}/${type}`
     fs.mkdirSync(directoryPath, { recursive: true });
     const filename = `${directoryPath}/outline.json`
 
     if (!fs.existsSync(filename)) {
 
-        const url = `${process.env.BASE_URL}/${city.name}/all?transportType=${type}`
-        const result = await fetch(url);
+        const url = `${process.env.BASE_URL}/${city}/all?transportType=${type}`
 
-        let data = ''
-        if (result.headers['content-encoding'] === 'gzip') {
-            data = await zlib.gunzipSync(result.body)
-        } else {
-            data = await result.json()
+        try {
+            const result = await fetch(url);
+
+            let data = ''
+            if (result.headers['content-encoding'] === 'gzip') {
+                data = await zlib.gunzipSync(result.body)
+            } else {
+                data = await result.json()
+            }
+
+            fs.writeFileSync(filename, JSON.stringify(data, null, 4));
+
+            return data
+        } catch (e) {
+            console.error(e)
+            throw e
         }
-
-        fs.writeFileSync(filename, JSON.stringify(data, null, 4));
-
-        return data
     } else {
         return JSON.parse(fs.readFileSync(filename, 'utf8'))
     }
+
 }
 
 
 
 
-const run = async() => {
+const run = async () => {
     for (const city of cities) {
         for (const type of city.transportationTypes) {
             console.log(`[${moment().format('HH:mm:ss')}] Processing ${city.name}>${type}`)
