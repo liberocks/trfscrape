@@ -75,7 +75,7 @@ const fetchScheduleDetail = async (city, type, lineId) => {
             data = await result.json()
         }
 
-        await sleep(Math.ceil(Math.random() * 3e3) + 1000);
+        await sleep(Math.ceil(Math.random() * 2e3) + 1000);
 
         fs.writeFileSync(filename, JSON.stringify(data, null, 4));
 
