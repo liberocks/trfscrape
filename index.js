@@ -60,7 +60,7 @@ const sleep = (ms) => {
 }
 
 const fetchScheduleDetail = async (city, type, lineId) => {
-    const directoryPath = `${DUMP_DIR}/${city.name}/${type}`
+    const directoryPath = `${DUMP_DIR}/${city}/${type}`
     fs.mkdirSync(directoryPath, { recursive: true });
     const filename = `${directoryPath}/${lineId}.json`
 
@@ -85,7 +85,7 @@ const fetchScheduleDetail = async (city, type, lineId) => {
 }
 
 const fetchScheduleOutline = async (city, type) => {
-    const directoryPath = `${DUMP_DIR}/${city.name}/${type}`
+    const directoryPath = `${DUMP_DIR}/${city}/${type}`
     fs.mkdirSync(directoryPath, { recursive: true });
     const filename = `${directoryPath}/outline.json`
 
